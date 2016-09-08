@@ -5,5 +5,6 @@
 
                 db.execSQL("DROP TABLE " + TABLE_NAME + ";");
                 db.execSQL("ALTER TABLE " + TABLE_NAME + "_tmp RENAME TO " + TABLE_NAME + ";");
+                %7$s
                 oldVersion = %1$d;
             }

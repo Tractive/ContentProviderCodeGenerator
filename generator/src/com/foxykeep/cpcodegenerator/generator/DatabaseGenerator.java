@@ -360,6 +360,11 @@ public class DatabaseGenerator {
                                     .getDefaultValue(fieldData.type));
                         }
                     }
+
+                    String upgradeGeotrace = "";
+                    if (tableData.dbTableName.equals("geotrace") && curVers == 13) {
+                        upgradeGeotrace = "TractiveDbUpgradeHelper.upgradeLocationsJsonToLocationsPath(db);";
+                    }
                     sbUpgradeTable.append(String.format(
                             contentSubClassUpgrade, curVers,
                             sbUpgradeTableCreateTmpTable.toString(),
@@ -368,7 +373,9 @@ public class DatabaseGenerator {
                             hasPreviousUnique ? String.format(UNIQUE_FORMAT,
                                     sbUpgradeTableCreateTmpTableUnique.toString()) : "",
                             sbUpgradeTableInsertFields.toString(),
-                            sbUpgradeTableInsertDefaultValues.toString()));
+                            sbUpgradeTableInsertDefaultValues.toString(), upgradeGeotrace));
+
+
 
                     hasPreviousUpgradeElements = false;
                     for (FieldData fieldData : upgradeFieldDataList) {
@@ -379,9 +386,11 @@ public class DatabaseGenerator {
 
                         sbUpgradeTableCommentNewFields.append(fieldData.dbConstantName);
                     }
+
                     sbUpgradeTableComment.append(String.format(UPGRADE_VERSION_COMMENT_FIELD,
                             curVers, sbUpgradeTableCommentNewFields.toString(),
                             upgradeFieldDataList.size() > 1 ? "s" : ""));
+
                 }
 
                 // No more changes for the last versions so add the code to jump to the latest
@@ -584,7 +593,6 @@ public class DatabaseGenerator {
                         sbUpgradeDatabaseComment.toString(),
                         hasProviderSubclasses ? "" : "final ",
                         sbCaseWithoutIdWithoutRaw));
-
     }
 
     private static void appendUpgradeDatabaseComment(final StringBuilder sb,
